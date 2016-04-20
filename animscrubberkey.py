@@ -52,16 +52,28 @@ class ScrubTimelineKey(bpy.types.Operator):
         context.window_manager.modal_handler_add(self)
         return {'RUNNING_MODAL'}
 
+        
+# store keymaps here to access after registration
+addon_fkeymaps = []
+            
 def register():
     bpy.utils.register_class(ScrubTimelineKey)
-    
+        
+    # handle the keymap
     wm = bpy.context.window_manager
     km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D', region_type='WINDOW', modal=False)
-    kmi = km.keymap_items.new('anim.scrubberkey', 'LEFTMOUSE', 'PRESS', alt=True)     
+    kmi = km.keymap_items.new('anim.scrubberkey', 'LEFTMOUSE', 'PRESS', alt=True)  
+    addon_fkeymaps.append(km)
+
 
 def unregister():
     bpy.utils.unregister_class(ScrubTimelineKey)
-    
+    # handle the keymap, not sure why I need this but didnt seem to work when I deleted it
+    wm = bpy.context.window_manager
+    for km in addon_fkeymaps:
+        wm.keyconfigs.addon.keymaps.remove(km)
+    # clear the list
+    del addon_fkeymaps[:]
     
 # This allows you to run the script directly from blenders text editor
 # to test the addon without having to install it.
